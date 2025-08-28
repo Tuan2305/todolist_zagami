@@ -28,4 +28,14 @@ namespace backend_zamiga.Interfaces
             string? searchMajor = null
         );
     }
+
+
+
+
+
+
+
+
+
+    
 }
