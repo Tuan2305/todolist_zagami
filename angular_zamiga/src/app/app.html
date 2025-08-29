@@ -1,0 +1,21 @@
+<header class="app-header">
+  <h1>{{ title }}</h1>
+</header>
+
+<main class="app-main">
+  <app-student-list
+    (editStudent)="onEditStudent($event)"
+    (addStudent)="onAddStudent()"
+  ></app-student-list>
+
+  
+  <app-modal [show]="showStudentModal" [title]="modalTitle" (close)="onCloseModal()">
+    <app-student-form
+      [student]="selectedStudent"
+      (save)="onSaveStudent($event)"
+      (cancel)="onCancelForm()"
+    ></app-student-form>
+  </app-modal>
+</main>
+
+<router-outlet></router-outlet>
