@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("backend_zamiga")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bc1cf9cfe53389bd940f32d7794601f9514db4b8")]
 [assembly: System.Reflection.AssemblyProductAttribute("backend_zamiga")]
 [assembly: System.Reflection.AssemblyTitleAttribute("backend_zamiga")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

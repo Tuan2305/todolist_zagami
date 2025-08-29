@@ -4,6 +4,7 @@ using backend_zamiga.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
+using backend_zamiga.Helpers; // <-- Thêm namespace này
 
 namespace backend_zamiga.Controllers
 {
@@ -18,43 +19,109 @@ namespace backend_zamiga.Controllers
             _studentRepo = studentRepo;
         }
 
-        // GET: /api/student?page=1&size=10&searchName=...&sortBy=...&sortOrder=...
+        // GET: /api/student?pageNumber=1&pageSize=10&searchName=...&sortBy=...&sortOrder=...
         [HttpGet]
-        public async Task<IActionResult> GetAll(
-            [FromQuery] int page = 1,
-            [FromQuery] int size = 10,
-            [FromQuery] string? searchCode = null,
-            [FromQuery] string? searchName = null,
-            [FromQuery] string? searchClass = null,
-            [FromQuery] string? searchMajor = null,
-            [FromQuery] string? sortBy = null,
-            [FromQuery] string? sortOrder = "asc"
-        )
+        public async Task<IActionResult> GetAll([FromQuery] StudentQueryObject queryObject) // <-- Nhận StudentQueryObject
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var students = await _studentRepo.GetAllStudentsAsync(
-                searchCode, searchName, searchClass, searchMajor,
-                sortBy, sortOrder, page, size
-            );
+            var students = await _studentRepo.GetAllStudentsAsync(queryObject); // <-- Truyền queryObject
 
-            var totalCount = await _studentRepo.GetTotalStudentsCountAsync(
-                searchCode, searchName, searchClass, searchMajor
-            );
+            var totalCount = await _studentRepo.GetTotalStudentsCountAsync(queryObject); // <-- Truyền queryObject
 
             var studentDto = students.Select(s => s.ToStudentDto()).ToList();
 
             // Thêm thông tin phân trang vào Headers
             Response.Headers.Add("X-Pagination-Total-Count", totalCount.ToString());
-            Response.Headers.Add("X-Pagination-Page-Size", size.ToString());
-            Response.Headers.Add("X-Pagination-Current-Page", page.ToString());
-            Response.Headers.Add("X-Pagination-Total-Pages", ((int)Math.Ceiling((double)totalCount / size)).ToString());
+            Response.Headers.Add("X-Pagination-Page-Size", queryObject.PageSize.ToString());
+            Response.Headers.Add("X-Pagination-Current-Page", queryObject.PageNumber.ToString());
+            Response.Headers.Add("X-Pagination-Total-Pages", ((int)Math.Ceiling((double)totalCount / queryObject.PageSize)).ToString());
 
 
             return Ok(studentDto);
         }
 
+        // Các endpoint tìm kiếm riêng biệt (SearchByCode, SearchByName, SearchByClass, SearchByMajor)
+        // Hiện tại, chúng ta có thể sử dụng phương thức GetAll chung với StudentQueryObject để thực hiện các tìm kiếm này.
+        // Tuy nhiên, nếu bạn vẫn muốn các endpoint riêng biệt này, chúng ta cần điều chỉnh chúng để gọi
+        // GetAllStudentsAsync với một StudentQueryObject cụ thể.
+
+        // Ví dụ điều chỉnh cho SearchByCode:
+        [HttpGet("search/code/{code}")]
+        public async Task<IActionResult> SearchByCode([FromRoute] string code)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var queryObject = new StudentQueryObject { SearchCode = code, PageSize = int.MaxValue }; // Lấy tất cả kết quả
+            var students = await _studentRepo.GetAllStudentsAsync(queryObject);
+
+            if (!students.Any())
+            {
+                return NotFound("Không tìm thấy sinh viên với mã này.");
+            }
+
+            var studentDto = students.Select(s => s.ToStudentDto()).ToList();
+            return Ok(studentDto);
+        }
+
+        // Điều chỉnh tương tự cho SearchByName, SearchByClass, SearchByMajor
+        [HttpGet("search/name/{name}")]
+        public async Task<IActionResult> SearchByName([FromRoute] string name)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var queryObject = new StudentQueryObject { SearchName = name, PageSize = int.MaxValue };
+            var students = await _studentRepo.GetAllStudentsAsync(queryObject);
+
+            if (!students.Any())
+            {
+                return NotFound("Không tìm thấy sinh viên với tên này.");
+            }
+
+            var studentDto = students.Select(s => s.ToStudentDto()).ToList();
+            return Ok(studentDto);
+        }
+
+        [HttpGet("search/class/{class}")]
+        public async Task<IActionResult> SearchByClass([FromRoute] string @class)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var queryObject = new StudentQueryObject { SearchClass = @class, PageSize = int.MaxValue };
+            var students = await _studentRepo.GetAllStudentsAsync(queryObject);
+
+            if (!students.Any())
+            {
+                return NotFound("Không tìm thấy sinh viên trong lớp này.");
+            }
+
+            var studentDto = students.Select(s => s.ToStudentDto()).ToList();
+            return Ok(studentDto);
+        }
+
+        [HttpGet("search/major/{major}")]
+        public async Task<IActionResult> SearchByMajor([FromRoute] string major)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var queryObject = new StudentQueryObject { SearchMajor = major, PageSize = int.MaxValue };
+            var students = await _studentRepo.GetAllStudentsAsync(queryObject);
+
+            if (!students.Any())
+            {
+                return NotFound("Không tìm thấy sinh viên trong chuyên ngành này.");
+            }
+
+            var studentDto = students.Select(s => s.ToStudentDto()).ToList();
+            return Ok(studentDto);
+        }
+
+        // Các API GetById, Create, Update, Delete vẫn giữ nguyên
         // GET: /api/student/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
@@ -70,78 +137,6 @@ namespace backend_zamiga.Controllers
             }
 
             return Ok(student.ToStudentDto());
-        }
-
-        // GET: /api/student/search/code/{code}
-        [HttpGet("search/code/{code}")]
-        public async Task<IActionResult> SearchByCode([FromRoute] string code)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var students = await _studentRepo.GetAllStudentsAsync(searchCode: code);
-
-            if (!students.Any())
-            {
-                return NotFound("Không tìm thấy sinh viên với mã này.");
-            }
-
-            var studentDto = students.Select(s => s.ToStudentDto()).ToList();
-            return Ok(studentDto);
-        }
-
-        // GET: /api/student/search/name/{name}
-        [HttpGet("search/name/{name}")]
-        public async Task<IActionResult> SearchByName([FromRoute] string name)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var students = await _studentRepo.GetAllStudentsAsync(searchName: name);
-
-            if (!students.Any())
-            {
-                return NotFound("Không tìm thấy sinh viên với tên này.");
-            }
-
-            var studentDto = students.Select(s => s.ToStudentDto()).ToList();
-            return Ok(studentDto);
-        }
-
-        // GET: /api/student/search/class/{class}
-        [HttpGet("search/class/{class}")]
-        public async Task<IActionResult> SearchByClass([FromRoute] string @class) // @class để tránh trùng từ khóa
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var students = await _studentRepo.GetAllStudentsAsync(searchClass: @class);
-
-            if (!students.Any())
-            {
-                return NotFound("Không tìm thấy sinh viên trong lớp này.");
-            }
-
-            var studentDto = students.Select(s => s.ToStudentDto()).ToList();
-            return Ok(studentDto);
-        }
-
-        // GET: /api/student/search/major/{major}
-        [HttpGet("search/major/{major}")]
-        public async Task<IActionResult> SearchByMajor([FromRoute] string major)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var students = await _studentRepo.GetAllStudentsAsync(searchMajor: major);
-
-            if (!students.Any())
-            {
-                return NotFound("Không tìm thấy sinh viên trong chuyên ngành này.");
-            }
-
-            var studentDto = students.Select(s => s.ToStudentDto()).ToList();
-            return Ok(studentDto);
         }
 
         // POST: /api/student/create

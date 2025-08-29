@@ -6,6 +6,7 @@ using backend_zamiga.Data;
 using backend_zamiga.Interfaces;
 using backend_zamiga.Models;
 using Microsoft.EntityFrameworkCore;
+using backend_zamiga.Helpers; 
 
 namespace backend_zamiga.Repository
 {
@@ -37,105 +38,92 @@ namespace backend_zamiga.Repository
             return studentModel;
         }
 
-        public async Task<List<Student>> GetAllStudentsAsync(
-            string? searchCode = null,
-            string? searchName = null,
-            string? searchClass = null,
-            string? searchMajor = null,
-            string? sortBy = null,
-            string? sortOrder = "asc",
-            int pageNumber = 1,
-            int pageSize = 10
-        )
+        public async Task<List<Student>> GetAllStudentsAsync(StudentQueryObject queryObject)
         {
             var studentsQuery = _context.Students.AsQueryable();
 
-            // Tìm kiếm
-            if (!string.IsNullOrWhiteSpace(searchCode))
+            if (!string.IsNullOrWhiteSpace(queryObject.SearchCode))
             {
-                studentsQuery = studentsQuery.Where(s => s.MaSv.Contains(searchCode));
+                studentsQuery = studentsQuery.Where(s => s.MaSv.Contains(queryObject.SearchCode));
             }
-            if (!string.IsNullOrWhiteSpace(searchName))
+            if (!string.IsNullOrWhiteSpace(queryObject.SearchName))
             {
-                studentsQuery = studentsQuery.Where(s => s.HoTen.Contains(searchName));
+                studentsQuery = studentsQuery.Where(s => s.HoTen.Contains(queryObject.SearchName));
             }
-            if (!string.IsNullOrWhiteSpace(searchClass))
+            if (!string.IsNullOrWhiteSpace(queryObject.SearchClass))
             {
-                studentsQuery = studentsQuery.Where(s => s.Lop.Contains(searchClass));
+                studentsQuery = studentsQuery.Where(s => s.Lop.Contains(queryObject.SearchClass));
             }
-            if (!string.IsNullOrWhiteSpace(searchMajor))
+            if (!string.IsNullOrWhiteSpace(queryObject.SearchMajor))
             {
-                studentsQuery = studentsQuery.Where(s => s.ChuyenNganh.Contains(searchMajor));
+                studentsQuery = studentsQuery.Where(s => s.ChuyenNganh.Contains(queryObject.SearchMajor));
             }
 
             // Sắp xếp
-            if (!string.IsNullOrWhiteSpace(sortBy))
+            if (!string.IsNullOrWhiteSpace(queryObject.SortBy))
             {
-                switch (sortBy.ToLower())
+                switch (queryObject.SortBy.ToLower())
                 {
                     case "name":
                     case "hoten":
-                        studentsQuery = (sortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.HoTen) : studentsQuery.OrderBy(s => s.HoTen);
+                        studentsQuery = (queryObject.SortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.HoTen) : studentsQuery.OrderBy(s => s.HoTen);
                         break;
                     case "dob":
                     case "ngaysinh":
-                        studentsQuery = (sortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.NgaySinh) : studentsQuery.OrderBy(s => s.NgaySinh);
+                        studentsQuery = (queryObject.SortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.NgaySinh) : studentsQuery.OrderBy(s => s.NgaySinh);
                         break;
                     case "code":
                     case "masv":
-                        studentsQuery = (sortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.MaSv) : studentsQuery.OrderBy(s => s.MaSv);
+                        studentsQuery = (queryObject.SortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.MaSv) : studentsQuery.OrderBy(s => s.MaSv);
                         break;
-                    // Thêm các trường sắp xếp khác nếu cần
+                    case "lop":
+                        studentsQuery = (queryObject.SortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.Lop) : studentsQuery.OrderBy(s => s.Lop);
+                        break;
+                    case "chuyennganh":
+                        studentsQuery = (queryObject.SortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.ChuyenNganh) : studentsQuery.OrderBy(s => s.ChuyenNganh);
+                        break;
                     default:
-                        // Mặc định sắp xếp theo ID nếu không khớp
-                        studentsQuery = (sortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.Id) : studentsQuery.OrderBy(s => s.Id);
+                        // Mặc định sắp xếp theo ID nếu không khớp hoặc không hợp lệ
+                        studentsQuery = (queryObject.SortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.Id) : studentsQuery.OrderBy(s => s.Id);
                         break;
                 }
             } else {
-                 // Mặc định sắp xếp theo ID nếu không có tiêu chí sắp xếp
-                studentsQuery = (sortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.Id) : studentsQuery.OrderBy(s => s.Id);
+                 // Mặc định sắp xếp theo ID nếu không có tiêu chí sắp xếp được cung cấp
+                studentsQuery = (queryObject.SortOrder?.ToLower() == "desc") ? studentsQuery.OrderByDescending(s => s.Id) : studentsQuery.OrderBy(s => s.Id);
             }
 
-
             // Phân trang
-            var skipAmount = (pageNumber - 1) * pageSize;
+            var skipAmount = (queryObject.PageNumber - 1) * queryObject.PageSize;
 
             return await studentsQuery
                 .Skip(skipAmount)
-                .Take(pageSize)
+                .Take(queryObject.PageSize)
                 .ToListAsync();
         }
 
-        public async Task<int> GetTotalStudentsCountAsync(
-            string? searchCode = null,
-            string? searchName = null,
-            string? searchClass = null,
-            string? searchMajor = null
-        )
+        public async Task<int> GetTotalStudentsCountAsync(StudentQueryObject queryObject)
         {
             var studentsQuery = _context.Students.AsQueryable();
 
-            // Áp dụng tìm kiếm tương tự GetAllStudentsAsync để lấy tổng số lượng cho kết quả tìm kiếm
-            if (!string.IsNullOrWhiteSpace(searchCode))
+            if (!string.IsNullOrWhiteSpace(queryObject.SearchCode))
             {
-                studentsQuery = studentsQuery.Where(s => s.MaSv.Contains(searchCode));
+                studentsQuery = studentsQuery.Where(s => s.MaSv.Contains(queryObject.SearchCode));
             }
-            if (!string.IsNullOrWhiteSpace(searchName))
+            if (!string.IsNullOrWhiteSpace(queryObject.SearchName))
             {
-                studentsQuery = studentsQuery.Where(s => s.HoTen.Contains(searchName));
+                studentsQuery = studentsQuery.Where(s => s.HoTen.Contains(queryObject.SearchName));
             }
-            if (!string.IsNullOrWhiteSpace(searchClass))
+            if (!string.IsNullOrWhiteSpace(queryObject.SearchClass))
             {
-                studentsQuery = studentsQuery.Where(s => s.Lop.Contains(searchClass));
+                studentsQuery = studentsQuery.Where(s => s.Lop.Contains(queryObject.SearchClass));
             }
-            if (!string.IsNullOrWhiteSpace(searchMajor))
+            if (!string.IsNullOrWhiteSpace(queryObject.SearchMajor))
             {
-                studentsQuery = studentsQuery.Where(s => s.ChuyenNganh.Contains(searchMajor));
+                studentsQuery = studentsQuery.Where(s => s.ChuyenNganh.Contains(queryObject.SearchMajor));
             }
 
             return await studentsQuery.CountAsync();
         }
-
 
         public async Task<Student?> GetStudentByIdAsync(int id)
         {
@@ -155,14 +143,11 @@ namespace backend_zamiga.Repository
                 return null;
             }
 
-            // Cập nhật các thuộc tính
             existingStudent.HoTen = studentModel.HoTen;
             existingStudent.GioiTinh = studentModel.GioiTinh;
             existingStudent.NgaySinh = studentModel.NgaySinh;
             existingStudent.Lop = studentModel.Lop;
             existingStudent.ChuyenNganh = studentModel.ChuyenNganh;
-            // Không cho phép cập nhật MaSv vì nó có thể là khóa duy nhất hoặc trường định danh chính
-            // existingStudent.MaSv = studentModel.MaSv; // Nếu bạn muốn cho phép cập nhật MaSv, hãy bỏ comment dòng này
 
             await _context.SaveChangesAsync();
             return existingStudent;
