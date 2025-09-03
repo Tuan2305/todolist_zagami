@@ -4,19 +4,23 @@ using backend_zamiga.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
-using backend_zamiga.Helpers; // <-- Thêm namespace này
+using backend_zamiga.Helpers; 
+using Microsoft.AspNetCore.Authorization;
+using backend_zamiga.Data;
 
 namespace backend_zamiga.Controllers
 {
     [Route("api/student")]
     [ApiController]
+    [Authorize(Roles = "Admin")] 
     public class StudentController : ControllerBase
     {
         private readonly IStudentRepository _studentRepo;
-
-        public StudentController(IStudentRepository studentRepo)
+        private readonly ApplicationDbContext _context;
+        public StudentController(IStudentRepository studentRepo, ApplicationDbContext context) // Inject _context
         {
             _studentRepo = studentRepo;
+            _context = context; // Khởi tạo _context
         }
 
         // GET: /api/student?pageNumber=1&pageSize=10&searchName=...&sortBy=...&sortOrder=...
