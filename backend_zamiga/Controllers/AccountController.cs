@@ -41,8 +41,6 @@ namespace backend_zamiga.Controllers
         }
 
         // POST: /api/account/register/admin
-        // Cảnh báo: Endpoint này cần được bảo mật rất chặt chẽ trong môi trường production.
-        // Lý tưởng nhất, tài khoản admin đầu tiên nên được tạo thông qua seeding hoặc một công cụ nội bộ.
         [HttpPost("register/admin")]
         public async Task<IActionResult> RegisterAdmin([FromBody] RegisterDto registerDto)
         {

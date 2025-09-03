@@ -1,1 +1,54 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss/preflight";
+@tailwind utilities;
+
+/* Box sizing cho tất cả các phần tử */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Base font size cho responsive */
+html {
+  font-size: 16px; /* Kích thước cơ bản cho rem */
+}
+@media (max-width: 768px) { /* Cho Tablet */
+  html {
+    font-size: 15px;
+  }
+}
+@media (max-width: 480px) { /* Cho Mobile */
+  html {
+    font-size: 14px;
+  }
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background-color: #eef2f6;
+  color: #333;
+  line-height: 1.6;
+   overflow-x: hidden;
+}
+
+.app-header {
+  background-color: #007bff;
+  color: white;
+  padding: 1rem 0; /* Sử dụng rem */
+  text-align: center;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1); /* Sử dụng rem */
+  margin-bottom: 1.25rem; /* Sử dụng rem */
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+}
+@media (max-width: 480px) {
+  .app-header h1 {
+    font-size: 1.8rem;
+  }
+}
+
+.app-main {
+  padding: 0 1rem; /* Sử dụng rem */
+}

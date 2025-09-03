@@ -1,0 +1,56 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2 class="register-title">Đăng ký tài khoản</h2>
+    <form (ngSubmit)="onRegister()" class="register-form">
+      <div class="form-group">
+        <label for="username">Tên đăng nhập</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="username"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          [(ngModel)]="password"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="role">Bạn muốn đăng ký với vai trò:</label>
+        <select id="role" name="role" [(ngModel)]="role">
+          <option value="student">Student</option>
+          <!-- <option value="admin">Admin</option> -->
+        </select>
+        <!-- <p class="role-hint">
+          (Lưu ý: Vai trò Admin nên được tạo hạn chế. Vui lòng cân nhắc khi chọn vai trò Admin.)
+        </p> -->
+      </div>
+      <button type="submit" class="btn-register">Đăng ký</button>
+      <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+    </form>
+    <div class="login-link">
+      <p>
+        Đã có tài khoản?
+        <a (click)="navigateToLogin()">Đăng nhập</a>
+      </p>
+    </div>
+  </div>
+</div>

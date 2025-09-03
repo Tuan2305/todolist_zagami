@@ -1,0 +1,81 @@
+<div class="student-list-container"> <!-- Tái sử dụng container chung -->
+  <h2>Quản lý Lớp học</h2>
+
+  <div class="controls-section">
+    <button (click)="addClass()" class="btn-add">Thêm Lớp học Mới</button>
+
+    <div class="search-sort-group">
+      <!-- Tìm kiếm -->
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        placeholder="Tìm kiếm theo mã, tên lớp, giáo viên..."
+        class="search-input"
+      />
+
+      <!-- Sắp xếp -->
+      <select [(ngModel)]="sortBy" (change)="onSort()" class="sort-select">
+        <option value="maLop">Sắp xếp theo Mã lớp</option>
+        <option value="tenLop">Sắp xếp theo Tên lớp</option>
+        <option value="giaoVien">Sắp xếp theo Giáo viên</option>
+        <option value="soLuongSinhVien">Sắp xếp theo Số SV</option>
+      </select>
+
+      <select [(ngModel)]="sortOrder" (change)="onSort()" class="sort-select">
+        <option value="asc">Tăng dần</option>
+        <option value="desc">Giảm dần</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="student-table"> <!-- Tái sử dụng table chung -->
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Mã lớp</th>
+          <th>Tên lớp</th>
+          <th>Giáo viên</th>
+          <th>Số SV</th>
+          <th>Thời gian học</th>
+          <th>Phòng học</th>
+          <th>Mô tả</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let classItem of classes">
+          <td data-label="ID">{{ classItem.id }}</td>
+          <td data-label="Mã lớp">{{ classItem.maLop }}</td>
+          <td data-label="Tên lớp">{{ classItem.tenLop }}</td>
+          <td data-label="Giáo viên">{{ classItem.giaoVien }}</td>
+          <td data-label="Số SV">{{ classItem.soLuongSinhVien }}</td>
+          <td data-label="Thời gian học">{{ classItem.thoiGianHoc }}</td>
+          <td data-label="Phòng học">{{ classItem.phongHoc }}</td>
+          <td data-label="Mô tả">{{ classItem.moTa }}</td>
+          <td data-label="Thao tác" class="flex flex-col md:flex-row justify-center items-center space-y-1 md:space-y-0 md:space-x-2">
+            <button (click)="editClass(classItem.id)" class="btn-edit">Sửa</button>
+            <button (click)="deleteClass(classItem.id)" class="btn-delete">Xóa</button>
+          </td>
+        </tr>
+        <tr *ngIf="classes.length === 0">
+          <td colspan="9" class="no-data">Không có lớp học nào.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Phân trang -->
+  <div class="pagination-controls" *ngIf="totalPages > 1">
+    <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1" class="btn-page">Trước</button>
+    <span>Trang {{ currentPage }} / {{ totalPages }}</span>
+    <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages" class="btn-page">Sau</button>
+
+    <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-select">
+      <option [ngValue]="5">5 lớp/trang</option>
+      <option [ngValue]="10">10 lớp/trang</option>
+      <option [ngValue]="20">20 lớp/trang</option>
+    </select>
+  </div>
+</div>

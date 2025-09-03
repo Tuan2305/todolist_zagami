@@ -1,118 +1,107 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Student } from '../models/student.model';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators'; // Import map operator
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+export interface StudentQueryObject {
+  searchCode?: string;
+  searchName?: string;
+  searchClass?: string;
+  searchMajor?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  pageNumber?: number;
+  pageSize?: number;
+}
+
+export interface PaginatedStudents {
+  students: Student[]; // Bây giờ students trong đây cũng sẽ có ngaySinh là Date
+  totalCount: number;
+  pageSize: number;
+  currentPage: number;
+  totalPages: number;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class StudentService {
-  private students: Student[] = [
-    { id: 1, maSv: 'SV001', hoTen: 'Nguyễn Văn A', gioiTinh: 'Nam', ngaySinh: '2000-01-15', lop: 'K18CLC1', chuyenNganh: 'Công nghệ thông tin' },
-    { id: 2, maSv: 'SV002', hoTen: 'Trần Thị B', gioiTinh: 'Nữ', ngaySinh: '2001-05-20', lop: 'K18CLC2', chuyenNganh: 'Khoa học máy tính' },
-    { id: 3, maSv: 'SV003', hoTen: 'Lê Văn C', gioiTinh: 'Nam', ngaySinh: '2000-11-10', lop: 'K19CLC1', chuyenNganh: 'Kỹ thuật phần mềm' },
-    { id: 4, maSv: 'SV004', hoTen: 'Phạm Thị D', gioiTinh: 'Nữ', ngaySinh: '2002-03-01', lop: 'K18CLC1', chuyenNganh: 'Hệ thống thông tin' },
-    { id: 5, maSv: 'SV005', hoTen: 'Hoàng Văn E', gioiTinh: 'Nam', ngaySinh: '1999-08-22', lop: 'K19CLC1', chuyenNganh: 'Công nghệ thông tin' },
-    { id: 6, maSv: 'SV006', hoTen: 'Đỗ Thị F', gioiTinh: 'Nữ', ngaySinh: '2001-12-05', lop: 'K18CLC2', chuyenNganh: 'Khoa học máy tính' },
-    { id: 7, maSv: 'SV007', hoTen: 'Vũ Minh G', gioiTinh: 'Nam', ngaySinh: '2000-04-18', lop: 'K19CLC1', chuyenNganh: 'Kỹ thuật phần mềm' },
-    { id: 8, maSv: 'SV008', hoTen: 'Bùi Thanh H', gioiTinh: 'Nữ', ngaySinh: '2002-07-30', lop: 'K18CLC1', chuyenNganh: 'Hệ thống thông tin' },
-  ];
-  private nextId: number = 9;
+  private apiUrl = 'http://localhost:5018/api/student'; // Đảm bảo đúng cổng backend của bạn
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
-  // Lấy toàn bộ sinh viên (chưa phân trang/sắp xếp)
-  getStudents(): Observable<Student[]> {
-    return of(this.students);
+  // Hàm tiện ích để chuyển đổi ngaySinh từ string (API) sang Date (Angular)
+  private convertStudentDates(student: any): Student {
+    // Backend trả về ngaySinh dưới dạng string (ví dụ: "2000-01-15T00:00:00")
+    // Frontend cần chuyển nó thành Date object
+    return {
+      ...student,
+      ngaySinh: student.ngaySinh ? new Date(student.ngaySinh) : student.ngaySinh // Nếu ngaySinh là null/undefined thì giữ nguyên
+    };
   }
 
-  // Lấy sinh viên theo ID
-  getStudentById(id: number): Observable<Student | undefined> {
-    return of(this.students.find(s => s.id === id));
+  getAllStudents(queryObject: StudentQueryObject): Observable<PaginatedStudents> {
+    let params = new HttpParams();
+    if (queryObject.pageNumber !== undefined) params = params.set('pageNumber', queryObject.pageNumber.toString());
+    if (queryObject.pageSize !== undefined) params = params.set('pageSize', queryObject.pageSize.toString());
+    if (queryObject.searchCode) params = params.set('searchCode', queryObject.searchCode);
+    if (queryObject.searchName) params = params.set('searchName', queryObject.searchName);
+    if (queryObject.searchClass) params = params.set('searchClass', queryObject.searchClass);
+    if (queryObject.searchMajor) params = params.set('searchMajor', queryObject.searchMajor);
+    if (queryObject.sortBy) params = params.set('sortBy', queryObject.sortBy);
+    if (queryObject.sortOrder) params = params.set('sortOrder', queryObject.sortOrder);
+
+    return this.http.get<any[]>(this.apiUrl, { params, observe: 'response' }).pipe( // <-- Sử dụng any[] tạm thời cho body
+      map(response => {
+        const totalCount = parseInt(response.headers.get('X-Pagination-Total-Count') || '0', 10);
+        const pageSize = parseInt(response.headers.get('X-Pagination-Page-Size') || '10', 10);
+        const currentPage = parseInt(response.headers.get('X-Pagination-Current-Page') || '1', 10);
+        const totalPages = parseInt(response.headers.get('X-Pagination-Total-Pages') || '1', 10);
+
+        // Ánh xạ từng sinh viên để chuyển đổi ngaySinh
+        const students = (response.body || []).map(this.convertStudentDates);
+
+        return {
+          students: students, // Đã là Student[] với ngaySinh là Date
+          totalCount,
+          pageSize,
+          currentPage,
+          totalPages
+        };
+      })
+    );
   }
 
-  // Thêm sinh viên
+  getStudentById(id: number): Observable<Student> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe( // <-- Sử dụng any tạm thời
+      map(this.convertStudentDates) // Chuyển đổi ngaySinh sang Date
+    );
+  }
+
   addStudent(student: Omit<Student, 'id'>): Observable<Student> {
-    const newStudent: Student = { ...student, id: this.nextId++ };
-    this.students.push(newStudent);
-    return of(newStudent);
+    // student.ngaySinh bây giờ là Date object, chuyển thành ISO string để gửi lên backend
+    const studentToSend = {
+        ...student,
+        ngaySinh: student.ngaySinh ? student.ngaySinh.toISOString() : null // Nếu ngaySinh là Date, chuyển đổi
+    };
+    return this.http.post<any>(`${this.apiUrl}/create`, studentToSend).pipe( // <-- Sử dụng any tạm thời
+      map(this.convertStudentDates) // Chuyển đổi ngaySinh của phản hồi sang Date
+    );
   }
 
-  // Cập nhật sinh viên
   updateStudent(updatedStudent: Student): Observable<Student> {
-    const index = this.students.findIndex(s => s.id === updatedStudent.id);
-    if (index > -1) {
-      this.students[index] = updatedStudent;
-      return of(updatedStudent);
-    }
-    return of(null as any); // Hoặc throw error
+    // updatedStudent.ngaySinh bây giờ là Date object, chuyển thành ISO string
+    const studentToSend = {
+        ...updatedStudent,
+        ngaySinh: updatedStudent.ngaySinh ? updatedStudent.ngaySinh.toISOString() : null
+    };
+    return this.http.put<any>(`${this.apiUrl}/update/${updatedStudent.id}`, studentToSend).pipe( // <-- Sử dụng any tạm thời
+      map(this.convertStudentDates) // Chuyển đổi ngaySinh của phản hồi sang Date
+    );
   }
 
-  // Xóa sinh viên
-  deleteStudent(id: number): Observable<boolean> {
-    const initialLength = this.students.length;
-    this.students = this.students.filter(s => s.id !== id);
-    return of(this.students.length < initialLength);
-  }
-
-  // Tìm kiếm theo Mã SV
-  searchByCode(code: string): Observable<Student[]> {
-    if (!code) {
-      return of(this.students);
-    }
-    return of(this.students.filter(s => s.maSv.toLowerCase().includes(code.toLowerCase())));
-  }
-
-  // Tìm kiếm theo Tên
-  searchByName(name: string): Observable<Student[]> {
-    if (!name) {
-      return of(this.students);
-    }
-    return of(this.students.filter(s => s.hoTen.toLowerCase().includes(name.toLowerCase())));
-  }
-
-  // Tìm kiếm theo Lớp
-  searchByClass(className: string): Observable<Student[]> {
-    if (!className) {
-      return of(this.students);
-    }
-    return of(this.students.filter(s => s.lop.toLowerCase().includes(className.toLowerCase())));
-  }
-
-  // Tìm kiếm theo Chuyên ngành
-  searchByMajor(major: string): Observable<Student[]> {
-    if (!major) {
-      return of(this.students);
-    }
-    return of(this.students.filter(s => s.chuyenNganh.toLowerCase().includes(major.toLowerCase())));
-  }
-
-  // Sắp xếp
-  sortStudents(sortBy: keyof Student, sortOrder: 'asc' | 'desc'): Observable<Student[]> {
-    const sortedStudents = [...this.students].sort((a, b) => {
-      const valA = a[sortBy];
-      const valB = b[sortBy];
-
-      if (typeof valA === 'string' && typeof valB === 'string') {
-        return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-      }
-      if (typeof valA === 'number' && typeof valB === 'number') {
-        return sortOrder === 'asc' ? valA - valB : valB - valA;
-      }
-      return 0;
-    });
-    return of(sortedStudents);
-  }
-
-  // Phân trang
-  getStudentsPaginated(page: number, size: number): Observable<Student[]> {
-    const startIndex = (page - 1) * size;
-    const endIndex = startIndex + size;
-    return of(this.students.slice(startIndex, endIndex));
-  }
-
-  // Lấy tổng số sinh viên (cần cho phân trang)
-  getTotalStudents(): Observable<number> {
-    return of(this.students.length);
+  deleteStudent(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/delete/${id}`);
   }
 }

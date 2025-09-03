@@ -4,7 +4,7 @@ export interface Student {
   maSv: string; 
   hoTen: string; 
   gioiTinh: String;
-  ngaySinh: string; 
+  ngaySinh: Date; 
   lop: string; 
   chuyenNganh: String;
   

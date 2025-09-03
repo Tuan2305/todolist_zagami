@@ -1,37 +1,46 @@
+/* src/app/components/student-list/student-list.component.css */
+
 .student-list-container {
-  padding: 20px;
-  max-width: 1200px; /* Tăng chiều rộng để chứa nhiều cột hơn */
-  margin: 20px auto;
+  padding: 1.25rem; /* 20px */
+  max-width: 1200px;
+  margin: 1.25rem auto; /* 20px */
   background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
+  overflow-x: hidden; /* Ngăn scroll ngang của container nếu có phần tử con tràn ra */
 }
 
 h2 {
   text-align: center;
   color: #333;
-  margin-bottom: 25px;
+  margin-bottom: 1.5rem; /* 24px */
+  font-size: 1.8rem;
+}
+@media (max-width: 480px) {
+  h2 {
+    font-size: 1.5rem;
+  }
 }
 
 .controls-section {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start; /* Điều chỉnh lại để flex-wrap tốt hơn */
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 15px; /* Tăng khoảng cách giữa các nhóm control */
+  flex-direction: column; /* Trên mobile, xếp các mục theo chiều dọc */
+  align-items: stretch; /* Kéo dài để chiếm hết chiều rộng */
+  margin-bottom: 1.25rem;
+  gap: 1rem; /* Khoảng cách giữa các mục */
 }
 
 .btn-add {
   background-color: #28a745;
   color: white;
-  padding: 10px 15px;
+  padding: 0.625rem 1rem; /* 10px 16px */
   border: none;
-  border-radius: 5px;
+  border-radius: 0.3125rem; /* 5px */
   cursor: pointer;
   font-size: 1rem;
   transition: background-color 0.3s ease;
-  white-space: nowrap; /* Ngăn nút xuống dòng */
+  width: 100%; /* Đảm bảo nút chiếm toàn bộ chiều rộng trên mobile */
+  text-align: center;
 }
 
 .btn-add:hover {
@@ -40,31 +49,106 @@ h2 {
 
 .search-sort-group {
     display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    flex-grow: 1; /* Cho phép nhóm này mở rộng */
-    justify-content: flex-end; /* Căn phải các controls */
+    flex-direction: column; /* Trên mobile, xếp các mục theo chiều dọc */
+    gap: 0.625rem; /* 10px */
+    align-items: stretch; /* Kéo dài để chiếm hết chiều rộng */
+    flex-grow: 1;
+      /* quan trọng để flex-item không ép vượt kích thước */
+
 }
 
 .search-input, .sort-select, .search-select, .page-size-select {
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem; /* 8px 12px */
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 0.3125rem; /* 5px */
   font-size: 1rem;
+  width: 100%; 
+
+  max-width: 100%;               /* không vượt quá parent */
+  min-width: 0;                  /* allow flex shrink */
+  white-space: nowrap;           /* không xuống dòng nội dung */
+  overflow: hidden;              /* ẩn phần quá dài */
+  text-overflow: ellipsis;       /* hiển thị dấu ... cho phần bị cắt */
+  /* -webkit-appearance: none;      */
+}
+/* Ngăn popup của một số browser mở rộng vì nội dung dài:
+   (chú ý: một số browser vẫn có thể mở dropdown rộng theo option text — để kiểm soát hoàn toàn cần custom dropdown) */
+.search-select option,
+.sort-select option,
+.page-size-select option {
+  white-space: nowrap;
+}
+
+/* Responsive: trên màn hình nhỏ hơn, giới hạn lại chiều rộng để phù hợp */
+@media (max-width: 480px) {
+  .search-sort-group {
+    max-width: 360px; /* nhỏ hơn để vừa vặn trên mobile */
+    margin: 0 auto;   /* căn giữa nếu muốn */
+  }
+}
+
+/* Trên desktop, cho select trở về kích thước auto */
+@media (min-width: 769px) {
+  .search-sort-group {
+    max-width: none;
+    flex-direction: row;
+  }
+
+  .search-input, .sort-select, .search-select, .page-size-select {
+    width: auto;
+    max-width: 200px;
+  }
+}
+
+
+/* Media Query cho Tablet và Desktop */
+@media (min-width: 769px) {
+  .controls-section {
+    flex-direction: row; /* Trên màn hình lớn hơn, xếp theo chiều ngang */
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu cần */
+    gap: 1.25rem; /* Tăng khoảng cách */
+  }
+
+  .search-sort-group {
+    flex-direction: row; /* Xếp theo chiều ngang */
+    justify-content: flex-end; /* Căn phải các controls */
+    flex-wrap: wrap;
+    flex-grow: unset; /* Không cần mở rộng hết */
+  }
+
+  .btn-add {
+    width: auto; /* Trở lại kích thước tự động */
+  }
+
+  .search-input, .sort-select, .search-select, .page-size-select {
+    width: auto; /* Trở lại kích thước tự động */
+    max-width: 180px; /* Giới hạn chiều rộng cho các input/select trên desktop */
+  }
+}
+
+
+/* Responsive Table */
+.table-wrapper { /* Thêm một wrapper cho bảng để xử lý overflow */
+    overflow-x: auto; /* Cho phép scroll ngang trên màn hình nhỏ */
+    -webkit-overflow-scrolling: touch; /* Cải thiện scrolling trên iOS */
+    margin-top: 1.25rem;
+    position: relative;
 }
 
 .student-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
   background-color: white;
+
 }
 
 .student-table th, .student-table td {
   border: 1px solid #ddd;
-  padding: 12px;
+  padding: 0.75rem; /* 12px */
   text-align: left;
+  white-space: nowrap; 
 }
 
 .student-table th {
@@ -81,13 +165,16 @@ h2 {
   background-color: #e2e6ea;
 }
 
+
+
+
 .btn-edit, .btn-delete {
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem; /* 8px 12px */
   border: none;
-  border-radius: 4px;
+  border-radius: 0.25rem; /* 4px */
   cursor: pointer;
   font-size: 0.9rem;
-  margin-right: 5px;
+  margin-right: 0.3125rem; /* 5px */
   transition: background-color 0.3s ease;
   white-space: nowrap;
 }
@@ -114,7 +201,7 @@ h2 {
   text-align: center;
   font-style: italic;
   color: #666;
-  padding: 20px;
+  padding: 1.25rem;
 }
 
 /* Styles for Pagination */
@@ -122,16 +209,17 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
-  gap: 10px;
+  margin-top: 1.25rem;
+  gap: 0.625rem; /* 10px */
+  flex-wrap: wrap; /* Cho phép xuống dòng trên mobile */
 }
 
 .btn-page {
   background-color: #007bff;
   color: white;
-  padding: 8px 15px;
+  padding: 0.5rem 0.9375rem; /* 8px 15px */
   border: none;
-  border-radius: 5px;
+  border-radius: 0.3125rem; /* 5px */
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.3s ease;
@@ -149,5 +237,6 @@ h2 {
 .pagination-controls span {
   font-size: 1rem;
   color: #555;
-  margin: 0 10px;
+  margin: 0 0.625rem; /* 10px */
+  white-space: nowrap;
 }

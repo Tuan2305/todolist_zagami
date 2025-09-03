@@ -1,0 +1,67 @@
+<div class="dashboard-container">
+  <!-- Top Section: Welcome & Info Cards -->
+  <div class="dashboard-widgets">
+    <div class="welcome-card">
+      <p class="welcome-greeting">Xin chào</p>
+      <h3 class="welcome-user">{{ currentUser?.userName }}</h3>
+      <a href="#" class="view-guide-link">Xem hướng dẫn sử dụng</a>
+    </div>
+
+    <div class="info-card orange-bg">
+      <div class="card-content">
+        <span class="card-number">{{ enrolledClassesCount }}</span>
+        <p class="card-text">Lớp đã tham gia</p>
+        <a href="#" class="card-detail-link">Chi tiết</a>
+      </div>
+    </div>
+
+    <div class="info-card darkblue-bg">
+      <div class="card-content">
+        <span class="card-number">{{ externalExamsCount }}</span>
+        <p class="card-text">Bài thi bên ngoài lớp học</p>
+        <a href="#" class="card-detail-link">Chi tiết</a>
+      </div>
+    </div>
+
+    <div class="info-card calendar-bg">
+      <div class="card-content">
+        <img src="assets/images/calendar.png" alt="Lịch học" class="calendar-icon"> <!-- Thay bằng ảnh lịch của bạn -->
+        <h3 class="calendar-title">LỊCH HỌC</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enrolled Classes Section -->
+  <div class="enrolled-classes-section">
+    <div class="section-header">
+      <div class="section-title-group">
+        <span class="title-indicator"></span>
+        <h3 class="section-title">LỚP ĐANG HỌC ({{ enrolledCourses.length }} LỚP)</h3>
+      </div>
+      <div class="section-actions">
+        <!-- Các icon view và xem thêm -->
+        <span class="view-icons">
+          <i class="icon-grid"></i> <!-- Icon lưới -->
+          <i class="icon-list"></i> <!-- Icon danh sách -->
+        </span>
+        <a href="#" class="view-more-link">Xem thêm</a>
+      </div>
+    </div>
+
+    <div class="carousel-container">
+      <button class="carousel-nav-btn left-btn" (click)="scrollLeft()">&lt;</button>
+      <div class="course-cards-container">
+        <div *ngFor="let course of enrolledCourses" class="course-card">
+          <img [src]="course.imageUrl" [alt]="course.title" class="course-image">
+          <div class="course-info">
+            <h4 class="course-title">{{ course.title }}</h4>
+            <p class="course-time">{{ course.timeRange }}</p>
+            <p class="course-enroll-date">{{ course.enrollmentDate }}</p>
+            <button class="btn-go-to-class" (click)="viewCourse(course.id)">Vào học</button>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-nav-btn right-btn" (click)="scrollRight()">&gt;</button>
+    </div>
+  </div>
+</div>

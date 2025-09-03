@@ -1,0 +1,112 @@
+/* src/app/components/sidebar/sidebar.component.css */
+
+
+.sidebar-container {
+  width: 250px; /* Chiều rộng cố định */
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  height: 100vh;
+  position: fixed; /* <-- Đảm bảo là fixed */
+  top: 0;
+  left: 0; /* <-- Đảm bảo là 0 */
+  z-index: 1000;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  transform: translateX(0);
+  transition: transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-header {
+  padding: 1.5rem 1rem;
+  background-color: #34495e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.close-sidebar-btn {
+  display: none; /* Mặc định ẩn trên desktop */
+  background: none;
+  border: none;
+  color: #ecf0f1;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.sidebar-nav {
+  flex-grow: 1; /* Cho phép nav chiếm hết không gian còn lại */
+  padding: 1rem 0;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin-bottom: 0.5rem;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  color: #ecf0f1;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.2s, color 0.2s;
+  border-left: 5px solid transparent; /* Viền trái cho active */
+  width: 100%; /* Cho nút đăng xuất */
+  text-align: left; /* Cho nút đăng xuất */
+  background: none; /* Reset background cho nút đăng xuất */
+  cursor: pointer;
+}
+
+.nav-link .nav-icon {
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.nav-link:hover {
+  background-color: #34495e;
+  color: #ffffff;
+}
+
+.nav-link.active-link {
+  background-color: #3b5998; /* Màu active */
+  border-left-color: #007bff; /* Viền active */
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.logout-btn {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 1rem;
+  color: #e74c3c; /* Màu đỏ cho logout */
+}
+
+.logout-btn:hover {
+  background-color: #e74c3c;
+  color: white;
+}
+
+/* Responsive cho Sidebar (đảm bảo nó ẩn/hiện đúng) */
+@media (max-width: 768px) {
+  .sidebar-container {
+    transform: translateX(-100%); /* Ẩn sidebar theo mặc định trên mobile */
+  }
+  .sidebar-container.open {
+    transform: translateX(0); /* Hiển thị khi có class 'open' */
+  }
+  .close-sidebar-btn {
+    display: block; /* Hiển thị nút đóng trên mobile */
+  }
+}

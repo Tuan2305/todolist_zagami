@@ -1,0 +1,29 @@
+
+<div class="sidebar-container">
+  <div class="sidebar-header">
+    <h3 class="sidebar-title">Admin Panel</h3>
+    <button class="close-sidebar-btn" (click)="closeSidebar()">×</button>
+  </div>
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item" *ngIf="authService.isAdmin()">
+        <a routerLink="/students" routerLinkActive="active-link" class="nav-link">
+          <i class="nav-icon fas fa-user-graduate"></i> <!-- Icon cho sinh viên -->
+          <span>Quản lý Sinh viên</span>
+        </a>
+      </li>
+      <li class="nav-item" *ngIf="authService.isAdmin()">
+        <a routerLink="/classes" routerLinkActive="active-link" class="nav-link">
+          <i class="nav-icon fas fa-chalkboard"></i> <!-- Icon cho lớp học -->
+          <span>Quản lý Lớp học</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <button (click)="onLogout()" class="nav-link logout-btn">
+          <i class="nav-icon fas fa-sign-out-alt"></i> <!-- Icon đăng xuất -->
+          <span>Đăng xuất</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>

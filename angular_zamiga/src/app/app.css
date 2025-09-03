@@ -1,0 +1,119 @@
+/* src/app/app.component.css */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f0f2f5; /* Màu nền tổng thể */
+  width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
+}
+
+/* main-content-wrapper bao gồm cả navbar top và router-outlet */
+.main-content-wrapper {
+  flex-grow: 1; /* Chiếm hết không gian còn lại */
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Bố cục cho Desktop (sidebar luôn hiển thị) */
+@media (min-width: 769px) {
+  .main-content-wrapper.sidebar-shifted { /* Khi sidebar hiển thị (chỉ Admin) */
+    margin-left: 250px; /* Tạo khoảng trống bằng chiều rộng của sidebar */
+  }
+  .main-content-wrapper:not(.sidebar-shifted) { /* Khi không có sidebar (ví dụ: Student dashboard) */
+    margin-left: 0;
+  }
+}
+
+/* Bố cục cho Mobile (sidebar ẩn theo mặc định) */
+@media (max-width: 768px) {
+  .main-content-wrapper {
+    margin-left: 0; /* Luôn là 0 trên mobile vì sidebar fixed sẽ chồng lên */
+  }
+  /* Cần đặt overflow-x: hidden cho body hoặc html để tránh scroll ngang khi sidebar mở */
+  body {
+    overflow-x: hidden;
+  }
+}
+
+
+.top-navbar {
+  background-color: #ffffff;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 999;
+  width: 100%; /* Quan trọng: Đảm bảo navbar chiếm 100% chiều rộng có sẵn */
+}
+
+.menu-toggle-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+  display: none; /* Mặc định ẩn trên desktop */
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-greeting {
+  font-size: 1rem;
+  color: #555;
+}
+
+.logout-btn-top {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.logout-btn-top:hover {
+  background-color: #c82333;
+}
+
+.router-outlet-container {
+  flex-grow: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+/* --- Responsive cho Navbar và Sidebar --- */
+@media (max-width: 768px) {
+  .sidebar-container {
+    transform: translateX(-100%); /* Ẩn sidebar theo mặc định trên mobile */
+    position: fixed; /* Đảm bảo nó chồng lên nội dung */
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    z-index: 1000;
+  }
+  .sidebar-container.open {
+    transform: translateX(0); /* Hiển thị khi có class 'open' */
+  }
+  .menu-toggle-btn {
+    display: block; /* Hiển thị nút menu trên mobile */
+  }
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+}
+

@@ -1,43 +1,51 @@
 .student-form-container {
-  padding: 20px;
+  padding: 1.25rem; /* 20px */
   max-width: 500px;
-  margin: 20px auto;
+  width: 95%; /* Chiếm 95% chiều rộng của cha */
+  margin: 1.25rem auto; /* 20px */
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem; /* 8px */
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.1);
 }
 
 h2 {
   text-align: center;
   color: #333;
-  margin-bottom: 25px;
+  margin-bottom: 1.5rem; /* 24px */
+  font-size: 1.6rem;
+}
+@media (max-width: 480px) {
+  h2 {
+    font-size: 1.3rem;
+  }
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 1rem; /* 16px */
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 0.3125rem; /* 5px */
   font-weight: bold;
   color: #555;
+  font-size: 0.95rem;
 }
 
 .form-group input[type="text"],
 .form-group input[type="date"],
-.form-group select { /* Thêm style cho select */
-  width: calc(100% - 24px);
-  padding: 10px 12px;
+.form-group select {
+  width: 100%; /* Chiếm 100% chiều rộng */
+  padding: 0.625rem 0.75rem; /* 10px 12px */
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 0.25rem; /* 4px */
   font-size: 1rem;
-  background-color: white; 
+  background-color: white;
 }
 
 .form-group input[type="text"]:focus,
 .form-group input[type="date"]:focus,
-.form-group select:focus { 
+.form-group select:focus {
   border-color: #007bff;
   outline: none;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
@@ -46,17 +54,26 @@ h2 {
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 0.625rem; /* 10px */
+  margin-top: 1.25rem; /* 20px */
+  flex-wrap: wrap; /* Cho phép xuống dòng nếu cần */
 }
 
 .btn-save, .btn-cancel {
-  padding: 10px 20px;
+  padding: 0.625rem 1.25rem; /* 10px 20px */
   border: none;
-  border-radius: 5px;
+  border-radius: 0.3125rem; /* 5px */
   cursor: pointer;
   font-size: 1rem;
   transition: background-color 0.3s ease;
+  flex-grow: 1; /* Cho phép nút mở rộng trên mobile */
+  max-width: 150px; /* Giới hạn chiều rộng trên desktop */
+}
+@media (max-width: 480px) {
+    .btn-save, .btn-cancel {
+        flex-grow: 1; /* Mở rộng hết chiều rộng trên mobile */
+        max-width: none;
+    }
 }
 
 .btn-save {
@@ -75,4 +92,4 @@ h2 {
 
 .btn-cancel:hover {
   background-color: #5a6268;
-}
+} 

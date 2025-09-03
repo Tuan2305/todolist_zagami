@@ -1,21 +1,34 @@
-<header class="app-header">
-  <h1>{{ title }}</h1>
-</header>
+<div class="app-layout">
+  <!-- Sidebar -->
+  <app-sidebar *ngIf="authService.isLoggedIn() && authService.isAdmin()"
+               [ngClass]="{'open': showSidebar}"
+               (toggleSidebar)="toggleSidebar()"></app-sidebar>
 
-<main class="app-main">
-  <app-student-list
-    (editStudent)="onEditStudent($event)"
-    (addStudent)="onAddStudent()"
-  ></app-student-list>
+  <div class="main-content-wrapper" [ngClass]="{'sidebar-shifted': authService.isLoggedIn() && authService.isAdmin()}">
+    <!-- Top Navbar (chỉ hiển thị khi đã đăng nhập) -->
+    <nav class="top-navbar" *ngIf="authService.isLoggedIn()">
+      <button class="menu-toggle-btn" (click)="toggleSidebar()">☰</button>
+      <div class="navbar-right">
+        <span class="user-greeting">Xin chào, {{ currentUser?.userName }} ({{ currentUser?.roles }})</span>
+        <button (click)="onLogout()" class="logout-btn-top">Đăng xuất</button>
+      </div>
+    </nav>
 
-  
-  <app-modal [show]="showStudentModal" [title]="modalTitle" (close)="onCloseModal()">
-    <app-student-form
-      [student]="selectedStudent"
-      (save)="onSaveStudent($event)"
-      (cancel)="onCancelForm()"
-    ></app-student-form>
-  </app-modal>
-</main>
+    <!-- Main Content Area -->
+    <main class="router-outlet-container">
+      <router-outlet></router-outlet>
+    </main>
 
-<router-outlet></router-outlet>
+    <!-- Modal (vẫn ở đây nếu bạn muốn nó là overlay toàn cục) -->
+    <app-modal [show]="showStudentModal" [title]="modalTitle" (close)="onCloseModal()">
+      <app-student-form
+        [student]="selectedStudent"
+        (save)="onSaveStudent($event)"
+        (cancel)="onCancelForm()"
+      ></app-student-form>
+    </app-modal>
+  </div>
+
+  <!-- Overlay cho mobile khi sidebar mở -->
+  <div class="sidebar-overlay" *ngIf="authService.isLoggedIn() && showSidebar && authService.isAdmin()" (click)="toggleSidebar()"></div>
+</div>

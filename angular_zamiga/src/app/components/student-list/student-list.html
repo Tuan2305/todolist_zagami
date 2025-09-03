@@ -39,7 +39,7 @@
       </select>
     </div>
   </div>
-
+<div class="table-wrapper">
   <table class="student-table">
     <thead>
       <tr>
@@ -72,17 +72,17 @@
       </tr>
     </tbody>
   </table>
-
+</div>
   <!-- Phân trang -->
   <div class="pagination-controls" *ngIf="totalPages > 1">
     <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1" class="btn-page">Trước</button>
     <span>Trang {{ currentPage }} / {{ totalPages }}</span>
     <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages" class="btn-page">Sau</button>
 
-    <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-select">
+    <!-- <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="page-size-select">
       <option [ngValue]="5">5 sinh viên/trang</option>
       <option [ngValue]="10">10 sinh viên/trang</option>
       <option [ngValue]="20">20 sinh viên/trang</option>
-    </select>
+    </select> -->
   </div>
 </div>

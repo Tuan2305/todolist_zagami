@@ -42,7 +42,8 @@
         type="date"
         id="ngaySinh"
         name="ngaySinh"
-        [(ngModel)]="currentStudent.ngaySinh"
+        [ngModel]="formatDateToInput(currentStudent.ngaySinh)"
+        (ngModelChange)="currentStudent.ngaySinh = parseDateFromInput($event)"
         required
       />
     </div>
